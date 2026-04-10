@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+build/
+
+# Environmental
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ML Models
+*.pt
+*.h5
+*.pth
+*.onnx
+
+# Media Output
+*.mp4
+*.avi
+*.mkv
+*.mov
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+.env/
+
+# Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
