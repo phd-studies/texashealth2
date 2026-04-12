@@ -1,45 +1,65 @@
-import { ChevronRight, ShieldCheck, Activity, Brain } from "lucide-react";
+import { Camera, Activity, FileStack, ChevronRight } from "lucide-react";
 
 export default function AppDashboard({ onStart }: { onStart: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center h-full text-center space-y-8 animate-in fade-in duration-500 flex-1 py-8">
-      <div className="w-20 h-20 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-4 border border-blue-500/20 shadow-inner">
-        <Activity className="w-10 h-10 text-blue-600 dark:text-blue-400" />
-      </div>
+    <div className="flex flex-col h-full animate-in fade-in duration-500 pt-16 px-5 pb-8 min-h-screen">
       
-      <div className="space-y-4 max-w-lg">
-        <h1 className="text-3xl font-semibold text-slate-800 dark:text-slate-100 tracking-tight">
-          Welcome to HealthScreen Pro
-        </h1>
-        <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
-          Advanced clinical analysis leveraging AI and biomechanical computer vision to provide rapid, trustworthy insights.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-xl pb-6">
-        <div className="bg-white/50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex items-start gap-4">
-          <Brain className="w-6 h-6 text-blue-500 shrink-0 mt-0.5" />
-          <div className="text-left">
-            <h3 className="font-medium text-slate-700 dark:text-slate-200 text-sm">AI-Powered</h3>
-            <p className="text-xs text-slate-500 mt-1">Deep learning evaluates subtle biomechanical markers instantly.</p>
-          </div>
+      {/* Apple Health style Header */}
+      <div className="flex items-end justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-black dark:text-white tracking-tight leading-tight">
+            Summary
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 font-medium text-sm mt-1">
+            Wound Management
+          </p>
         </div>
-        <div className="bg-white/50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex items-start gap-4">
-          <ShieldCheck className="w-6 h-6 text-emerald-500 shrink-0 mt-0.5" />
-          <div className="text-left">
-            <h3 className="font-medium text-slate-700 dark:text-slate-200 text-sm">Secure & Private</h3>
-            <p className="text-xs text-slate-500 mt-1">All processing happens directly within your secure environment.</p>
-          </div>
+        <div className="bg-red-50 dark:bg-red-900/20 w-10 h-10 rounded-full flex items-center justify-center border border-red-100 dark:border-red-900 shadow-sm">
+          <Activity className="text-red-500 w-5 h-5" />
         </div>
       </div>
 
-      <button
-        onClick={onStart}
-        className="group relative inline-flex items-center justify-center px-8 py-3.5 text-sm font-medium text-white transition-all duration-200 bg-blue-600 border border-transparent rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
-      >
-        Start Screening
-        <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-      </button>
+      {/* Bento Grid */}
+      <div className="grid grid-cols-2 gap-4 flex-1">
+        
+        {/* Status Card */}
+        <div className="col-span-2 bg-white dark:bg-[#1c1c1e] rounded-[2rem] p-6 shadow-apple flex items-center justify-between">
+          <div>
+            <h3 className="text-gray-500 dark:text-gray-400 font-medium text-sm mb-1 uppercase tracking-wider">Status</h3>
+            <p className="text-2xl font-semibold text-black dark:text-white tracking-tight">Active Tracking</p>
+          </div>
+          <div className="w-12 h-12 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
+            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+          </div>
+        </div>
+
+        {/* Wound History Card */}
+        <div className="col-span-2 bg-white dark:bg-[#1c1c1e] rounded-[2rem] p-6 shadow-apple flex flex-col justify-between min-h-[140px]">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-gray-500 dark:text-gray-400 font-medium text-sm uppercase tracking-wider">History</h3>
+            <FileStack className="w-5 h-5 text-gray-300 dark:text-gray-600" />
+          </div>
+          <div className="flex-1 flex items-end justify-between">
+            <div>
+              <p className="text-lg font-semibold text-black dark:text-white">No logs yet</p>
+              <p className="text-gray-400 text-sm mt-0.5">Start your first assessment</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* Primary CTA fixed to bottom */}
+      <div className="mt-6 mb-6">
+        <button
+          onClick={onStart}
+          className="w-full bg-[#007aff] dark:bg-[#0a84ff] hover:opacity-90 active:scale-[0.98] transition-all duration-200 text-white font-semibold rounded-2xl py-4 flex items-center justify-center shadow-apple shadow-blue-500/20"
+        >
+          <Camera className="w-5 h-5 mr-2" />
+          <span className="text-lg tracking-wide">Take a Photo</span>
+        </button>
+      </div>
+
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { UploadCloud, Camera, Video, ArrowLeft } from "lucide-react";
+import { UploadCloud, Camera as CameraIcon, Video, ArrowLeft } from "lucide-react";
 
 export default function CameraBooth({ 
   onSimulateUpload,
@@ -8,46 +8,52 @@ export default function CameraBooth({
   onBack: () => void;
 }) {
   return (
-    <div className="flex flex-col h-full animate-in zoom-in-95 duration-500">
-      <div className="flex items-center mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors">
-          <ArrowLeft className="w-5 h-5" />
+    <div className="flex flex-col h-full animate-in slide-in-from-right-4 duration-300 min-h-screen bg-[#f2f2f7] dark:bg-black pt-14">
+      
+      {/* Navigation Header */}
+      <div className="flex items-center px-4 mb-6 sticky top-0 bg-[#f2f2f7]/80 dark:bg-black/80 backdrop-blur-md pb-4 pt-2 z-10">
+        <button 
+          onClick={onBack} 
+          className="flex items-center text-[#007aff] dark:text-[#0a84ff] hover:opacity-80 transition-opacity active:opacity-50"
+        >
+          <ArrowLeft className="w-6 h-6 mr-1" />
+          <span className="text-lg font-medium">Summary</span>
         </button>
-        <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 text-center flex-1 pr-8">
-          Video Input
-        </h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-[300px]">
-        {/* Module 1: File Upload */}
-        <div 
-          onClick={onSimulateUpload}
-          className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl flex flex-col items-center justify-center p-8 bg-slate-50/50 dark:bg-slate-800/30 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer group"
-        >
-          <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-            <UploadCloud className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-          </div>
-          <h3 className="font-medium text-slate-700 dark:text-slate-200">Upload Recording</h3>
-          <p className="text-xs text-slate-500 text-center mt-2 px-4">
-            Drag and drop your MP4/MOV file here, or click to browse.
-          </p>
-        </div>
+      <div className="px-5 pb-8 flex-1 flex flex-col">
+        <h2 className="text-2xl font-bold text-black dark:text-white mb-8 tracking-tight px-1">
+          Add Log
+        </h2>
 
-        {/* Module 2: Webcam Record */}
-        <div 
-          onClick={onSimulateUpload}
-          className="border border-slate-200 dark:border-slate-700 rounded-2xl flex flex-col items-center justify-center p-8 bg-gradient-to-b from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 shadow-sm hover:shadow-md transition-all cursor-pointer group"
-        >
-          <div className="relative">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform relative z-10">
-              <Camera className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+        <div className="space-y-4 flex-1">
+          {/* Use Camera Component */}
+          <div 
+            onClick={onSimulateUpload}
+            className="bg-white dark:bg-[#1c1c1e] rounded-3xl p-6 shadow-apple flex items-center gap-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors active:scale-[0.98]"
+          >
+            <div className="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/40 flex items-center justify-center shrink-0">
+              <CameraIcon className="w-7 h-7 text-[#007aff] dark:text-[#0a84ff]" />
             </div>
-            <div className="absolute top-0 left-0 w-16 h-16 bg-emerald-400 rounded-full animate-ping opacity-20"></div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg text-black dark:text-white">Camera</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Capture a new image now</p>
+            </div>
           </div>
-          <h3 className="font-medium text-slate-700 dark:text-slate-200">Start Camera</h3>
-          <p className="text-xs text-slate-500 text-center mt-2 px-4">
-            Record directly using your device's webcam. <Video className="w-3 h-3 inline pb-[1px]" />
-          </p>
+
+          {/* Upload Library Component */}
+          <div 
+            onClick={onSimulateUpload}
+            className="bg-white dark:bg-[#1c1c1e] rounded-3xl p-6 shadow-apple flex items-center gap-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors active:scale-[0.98]"
+          >
+            <div className="w-14 h-14 rounded-2xl bg-orange-50 dark:bg-orange-900/40 flex items-center justify-center shrink-0">
+              <UploadCloud className="w-7 h-7 text-orange-500" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg text-black dark:text-white">Photo Library</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Select from camera roll</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

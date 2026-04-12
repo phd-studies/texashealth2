@@ -1,71 +1,70 @@
-import { RefreshCcw, FileText, ActivitySquare, ShieldAlert } from "lucide-react";
+import { HeartPulse, CheckCircle2, AlertTriangle, ArrowLeft } from "lucide-react";
 
 export default function HealthReportViewer({ onRestart }: { onRestart: () => void }) {
   return (
-    <div className="flex flex-col h-full animate-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-200 dark:border-slate-700/50">
-        <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-          <FileText className="w-5 h-5 text-blue-500" />
-          Analysis Complete
-        </h2>
-        <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium rounded-full border border-green-200 dark:border-green-800">
-          Confidence: 94%
-        </span>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        {/* Main Findings */}
-        <div className="md:col-span-2 space-y-4">
-          <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5 border border-slate-200 dark:border-slate-700/80 shadow-sm">
-            <h3 className="font-medium text-slate-800 dark:text-slate-200 flex items-center gap-2 mb-3 text-sm">
-              <ActivitySquare className="w-4 h-4 text-purple-500" />
-              Clinical Summary
-            </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-              The AI model analyzed 240 frames of subject movement. Postural symmetry is within normal bounds. There are mild indications of constrained shoulder mobility on the right hemisphere during abduction. No acute physiological distress signs detected.
-            </p>
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700">
-                <span className="block text-slate-400 mb-1">Heart Rate Est.</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-200 text-sm">76 BPM</span>
-              </div>
-              <div className="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700">
-                <span className="block text-slate-400 mb-1">Gait Flow</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-200 text-sm">Balanced</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Actionable Alerts */}
-        <div className="space-y-4">
-          <div className="bg-orange-50/50 dark:bg-orange-900/10 rounded-xl p-5 border border-orange-200 dark:border-orange-800/50 shadow-sm h-full">
-            <h3 className="font-medium text-slate-800 dark:text-slate-200 flex items-center gap-2 mb-3 text-sm">
-              <ShieldAlert className="w-4 h-4 text-orange-500" />
-              Observations
-            </h3>
-            <ul className="text-sm space-y-3">
-              <li className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-orange-400 mt-1.5 shrink-0" />
-                <span className="text-slate-600 dark:text-slate-300 leading-tight">Right shoulder abduction limits at ~140° (expected 180°).</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 mt-1.5 shrink-0" />
-                <span className="text-slate-500 dark:text-slate-400 leading-tight">Minor asymmetric weight distribution detected (L: 45%, R: 55%).</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-auto flex justify-center pt-2">
-        <button
-          onClick={onRestart}
-          className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
+    <div className="flex flex-col h-full animate-in slide-in-from-bottom-8 duration-500 min-h-screen bg-[#f2f2f7] dark:bg-black pt-14 px-5 pb-8">
+      
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <button 
+          onClick={onRestart} 
+          className="text-[#007aff] dark:text-[#0a84ff] font-medium text-lg active:opacity-50 transition-opacity"
         >
-          <RefreshCcw className="w-4 h-4" />
-          New Assessment
+          Done
         </button>
+      </div>
+
+      <h1 className="text-3xl font-bold text-black dark:text-white mb-6 tracking-tight px-1">
+        Analysis
+      </h1>
+
+      <div className="space-y-4 flex-1">
+        
+        {/* Main Status Bento Box */}
+        <div className="bg-white dark:bg-[#1c1c1e] rounded-[2rem] p-6 shadow-apple">
+          <div className="flex items-center gap-3 mb-2">
+            <CheckCircle2 className="w-6 h-6 text-green-500" />
+            <h2 className="text-xl font-bold text-black dark:text-white tracking-tight">Healing Expected</h2>
+          </div>
+          <p className="text-gray-500 dark:text-gray-400 text-[15px] leading-relaxed mt-2">
+            The wound is granulating well. Epithelialization observed at borders. Granulation tissue appears healthy with no visible purulence or erythema indicating infection.
+          </p>
+        </div>
+
+        {/* Analytics Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white dark:bg-[#1c1c1e] rounded-3xl p-5 shadow-apple flex flex-col justify-between">
+            <h3 className="text-gray-500 dark:text-gray-400 font-medium text-xs uppercase tracking-wider mb-2">Confidence</h3>
+            <p className="text-3xl font-semibold text-black dark:text-white tracking-tighter">
+              96<span className="text-lg text-gray-500">%</span>
+            </p>
+          </div>
+          <div className="bg-white dark:bg-[#1c1c1e] rounded-3xl p-5 shadow-apple flex flex-col justify-between">
+            <h3 className="text-gray-500 dark:text-gray-400 font-medium text-xs uppercase tracking-wider mb-2">Area Est.</h3>
+            <p className="text-3xl font-semibold text-black dark:text-white tracking-tighter">
+              2.4<span className="text-lg text-gray-500 flex-1">cm²</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Risk Alerts */}
+        <div className="bg-[#fff4e5] dark:bg-orange-950/30 rounded-3xl p-6 shadow-apple border border-orange-100 dark:border-orange-900/50">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle className="w-5 h-5 text-orange-500" />
+            <h3 className="font-semibold text-orange-900 dark:text-orange-200">Notes</h3>
+          </div>
+          <ul className="space-y-2 text-sm text-orange-800 dark:text-orange-300">
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-400 mt-1.5 shrink-0" />
+              Keep elevated to reduce localized swelling.
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-400 mt-1.5 shrink-0" />
+              Change dressing daily to maintain moisture balance.
+            </li>
+          </ul>
+        </div>
+        
       </div>
     </div>
   );
