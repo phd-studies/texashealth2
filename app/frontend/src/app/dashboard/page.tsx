@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import dbConnect from "@/lib/mongodb";
 import Assessment from "@/models/Assessment";
-import { FileStack, Camera } from "lucide-react";
+import { FileStack, Camera, User, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 
@@ -40,6 +40,22 @@ export default async function DashboardPage() {
                 }}
               />
             </div>
+          </div>
+
+          {/* Action Row */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <Link href="/profile" className="col-span-2 bg-white dark:bg-[#1c1c1e] rounded-[2rem] p-5 shadow-apple flex items-center justify-between hover:bg-gray-50 dark:hover:bg-[#252528] transition-colors group">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                  <User className="text-blue-500 dark:text-[#0a84ff] w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-black dark:text-white text-lg">Profile Settings</h3>
+                  <p className="text-xs text-gray-500 font-medium mt-0.5">Edit clinical demographics</p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-300 dark:text-gray-600 mr-2 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
 
           <div className="flex-1">
