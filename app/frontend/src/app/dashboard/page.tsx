@@ -1,7 +1,8 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import dbConnect from "@/lib/mongodb";
 import Assessment from "@/models/Assessment";
+import PatientProfile from "@/models/PatientProfile";
 import { FileStack, Camera, User, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
@@ -16,6 +17,10 @@ export default async function DashboardPage() {
   await dbConnect();
   
   const assessments = await Assessment.find({ userId }).sort({ date: -1 }).lean();
+  const profile = await PatientProfile.findOne({ userId }).lean();
+  
+  const user = await currentUser();
+  const displayName = profile?.name || user?.firstName || "Patient";
 
   return (
     <div className="min-h-screen flex justify-center bg-[#f2f2f7] dark:bg-black">
@@ -25,7 +30,7 @@ export default async function DashboardPage() {
           <div className="flex items-end justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold text-black dark:text-white tracking-tight leading-tight">
-                Dashboard
+                Welcome, {displayName}!
               </h1>
               <p className="text-gray-500 dark:text-gray-400 font-medium text-sm mt-1">
                 Your Assessments
