@@ -1,0 +1,33 @@
+name: Deploy Frontend (PM2)
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build + restart frontend on Azure VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -euo pipefail
+
+            APP_DIR=/home/azureuser/texashealth/app/frontend
+
+            bash -lc "
+              set -e
+              cd $APP_DIR
+
+              echo 'PWD:' \$(pwd)
+              node -v
+              npm -v
+
+              npm install
+              npm run build
+
+              sudo env \"PATH=\$PATH\" pm2 restart texashealth-ui
+              sudo env \"PATH=\$PATH\" pm2 status
+            "
