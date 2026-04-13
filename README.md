@@ -15,7 +15,7 @@ This repository contains the web-based health screening application.
 - **Service:** Azure App Service (Web App)
 - **Publish Method:** Code
 - **Operating System:** Linux
-- **Runtime Stack:** Node 20 LTS (or Node 18 LTS, matching our `package.json` requirements)
+- **Runtime Stack:** Node 22 LTS (or Node 20 LTS, matching our `package.json` requirements)
 - **Pricing Plan:** Basic B1 (Utilizing Azure for Students credit)
 
 ### Critical App Configurations
