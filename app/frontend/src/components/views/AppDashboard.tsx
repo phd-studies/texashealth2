@@ -1,5 +1,6 @@
 import { Camera, Activity, FileStack, ChevronRight } from "lucide-react";
 import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
+import Link from "next/link";
 
 export default function AppDashboard({ onStart }: { onStart: () => void }) {
   const { isLoaded, isSignedIn } = useAuth();
@@ -109,13 +110,23 @@ export default function AppDashboard({ onStart }: { onStart: () => void }) {
 
       {/* Primary CTA fixed to bottom */}
       <div className="mt-6 mb-6">
-        <button
-          onClick={onStart}
-          className="w-full bg-[#007aff] dark:bg-[#0a84ff] hover:opacity-90 active:scale-[0.98] transition-all duration-200 text-white font-semibold rounded-2xl py-4 flex items-center justify-center shadow-apple shadow-blue-500/20"
-        >
-          <Camera className="w-5 h-5 mr-2" />
-          <span className="text-lg tracking-wide">Take a Photo</span>
-        </button>
+        {(!isLoaded) ? null : isSignedIn ? (
+          <Link
+            href="/dashboard"
+            className="w-full bg-[#007aff] dark:bg-[#0a84ff] hover:opacity-90 active:scale-[0.98] transition-all duration-200 text-white font-semibold rounded-2xl py-4 flex items-center justify-center shadow-apple shadow-blue-500/20"
+          >
+            <span className="text-lg tracking-wide">Go to Dashboard</span>
+            <ChevronRight className="w-5 h-5 ml-1" />
+          </Link>
+        ) : (
+          <button
+            onClick={onStart}
+            className="w-full bg-[#007aff] dark:bg-[#0a84ff] hover:opacity-90 active:scale-[0.98] transition-all duration-200 text-white font-semibold rounded-2xl py-4 flex items-center justify-center shadow-apple shadow-blue-500/20"
+          >
+            <Camera className="w-5 h-5 mr-2" />
+            <span className="text-lg tracking-wide">Take a Photo</span>
+          </button>
+        )}
       </div>
 
     </div>
