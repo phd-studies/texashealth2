@@ -30,5 +30,7 @@ jobs:
             npm install
             npm run build
 
-            sudo env "PATH=$PATH" pm2 restart texashealth-ui
+            sudo env "PATH=$PATH" pm2 delete texashealth-ui || true
+            sudo env "PATH=$PATH" pm2 start npm --name texashealth-ui -- run start
+            sudo env "PATH=$PATH" pm2 save
             sudo env "PATH=$PATH" pm2 status
