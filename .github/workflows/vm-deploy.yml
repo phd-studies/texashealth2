@@ -7,68 +7,28 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: './package-lock.json'
-
-      - name: Install Dependencies
-        run: npm install --workspace=app/frontend
-
-      - name: Build Next.js
-        env:
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          UPLOADTHING_TOKEN: ${{ secrets.UPLOADTHING_TOKEN }}
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-        run: npm run build --workspace=app/frontend
-
-      - name: Compress .next build output
-        # We only compress the compiled output, NOT node_modules (much smaller)
-        run: |
-          tar -czf next-build.tar.gz -C app/frontend .next
-
-      - name: Copy .next build to VM
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          source: "next-build.tar.gz"
-          target: "/tmp"
-
-      - name: Deploy on VM
+      - name: Build + Deploy on Azure VM
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          command_timeout: 10m
+          command_timeout: 20m
           script: |
             set -e
-            APP_DIR=~/texashealth/app/frontend
-
-            # Pull latest source files (package.json, source code, etc.)
             cd ~/texashealth
+
             git fetch origin main
             git reset --hard origin/main
 
-            # Replace the .next folder with our CI-built one
-            cd $APP_DIR
-            rm -rf .next
-            tar -xzf /tmp/next-build.tar.gz -C $APP_DIR
+            cd app/frontend
 
-            # Install only production deps (fast, no compilation)
-            npm ci --omit=dev
+            # Ensure .env.local has AZURE_STORAGE_CONNECTION_STRING set on this VM
+            npm install
+            npm run build
 
-            # Restart PM2
             sudo env "PATH=$PATH" pm2 restart texashealth-ui
             sudo env "PATH=$PATH" pm2 status
