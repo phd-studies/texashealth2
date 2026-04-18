@@ -15,6 +15,7 @@ export default function CameraBooth() {
   const [isLiveCamera, setIsLiveCamera] = useState<boolean>(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -36,18 +37,21 @@ export default function CameraBooth() {
 
   const startCamera = async () => {
     try {
-      setIsLiveCamera(true);
-      setErrorMsg("");
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+      if (window.isSecureContext) {
+        setIsLiveCamera(true);
+        setErrorMsg("");
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" },
+        });
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } else {
+        cameraInputRef.current?.click();
       }
     } catch (err: any) {
-      setErrorMsg("Failed to access camera: " + err.message);
-      setIsLiveCamera(false);
+      cameraInputRef.current?.click();
     }
   };
 
@@ -262,6 +266,14 @@ export default function CameraBooth() {
             ref={fileInputRef}
             type="file"
             accept="image/jpeg,image/jpg,image/png"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/jpeg,image/jpg,image/png"
+            capture="environment"
             onChange={handleFileChange}
             className="hidden"
           />
