@@ -3,9 +3,10 @@ import { redirect } from "next/navigation";
 import dbConnect from "@/lib/mongodb";
 import Assessment from "@/models/Assessment";
 import PatientProfile from "@/models/PatientProfile";
-import { FileStack, Camera, User, ChevronRight } from "lucide-react";
+import { FileStack, Camera, User, ChevronRight, Trash } from "lucide-react";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
+import { deleteAssessment } from "@/actions/assessmentActions";
 
 export default async function DashboardPage() {
   const { userId } = await auth();
@@ -76,19 +77,50 @@ export default async function DashboardPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {assessments.map((a: any) => (
-                  <div key={a._id.toString()} className="bg-white dark:bg-[#1c1c1e] rounded-[2rem] p-5 shadow-apple flex items-center justify-between hover:bg-gray-50 dark:hover:bg-[#252528] transition-colors cursor-pointer">
-                    <div>
-                      <p className="font-semibold text-black dark:text-white text-lg">{a.woundType || "General Screen"}</p>
-                      <p className="text-sm text-gray-500 mt-1">{new Date(a.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                    </div>
-                    {a.sizeCm2 && (
-                      <div className="bg-[#007aff]/10 dark:bg-[#0a84ff]/20 px-3 py-1.5 rounded-xl border border-[#007aff]/20 flex items-center justify-center">
-                        <p className="text-[#007aff] dark:text-[#0a84ff] font-bold text-sm tracking-tight">{a.sizeCm2} cm²</p>
+                {assessments.map((a: any) => {
+                  const deleteAction = deleteAssessment.bind(null, a._id.toString());
+                  return (
+                    <div key={a._id.toString()} className="bg-white dark:bg-[#1c1c1e] rounded-[2rem] p-3 shadow-apple flex items-center justify-between hover:bg-gray-50 dark:hover:bg-[#252528] transition-colors">
+                      <div className="flex items-center gap-4">
+                        {/* Thumbnail */}
+                        {a.imageUrl ? (
+                          <div className="w-16 h-16 shrink-0 overflow-hidden rounded-[1.25rem] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                            <img src={a.imageUrl} alt="Assessment" className="w-full h-full object-cover" />
+                          </div>
+                        ) : (
+                          <div className="w-16 h-16 shrink-0 rounded-[1.25rem] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
+                            <Camera className="w-6 h-6 text-gray-400" />
+                          </div>
+                        )}
+                        
+                        {/* Content */}
+                        <div>
+                          <p className="font-semibold text-black dark:text-white text-lg">{a.woundType || "General Screen"}</p>
+                          <p className="text-sm text-gray-500 mt-0.5">{new Date(a.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                ))}
+
+                      <div className="flex items-center gap-3 pr-2">
+                        {a.sizeCm2 && (
+                          <div className="bg-[#007aff]/10 dark:bg-[#0a84ff]/20 px-3 py-1.5 rounded-xl border border-[#007aff]/20 flex flex-col items-center justify-center leading-none">
+                            <p className="text-[#007aff] dark:text-[#0a84ff] font-bold text-sm tracking-tight">{a.sizeCm2} cm²</p>
+                          </div>
+                        )}
+                        
+                        {/* Delete Form Action */}
+                        <form action={deleteAction}>
+                          <button 
+                            type="submit" 
+                            className="p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors active:scale-95"
+                            title="Delete Assessment"
+                          >
+                            <Trash className="w-5 h-5" />
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

@@ -34,3 +34,26 @@ export async function createAssessment(imageUrl: string) {
     return { success: false, error: "Failed to create assessment." };
   }
 }
+
+export async function deleteAssessment(assessmentId: string) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized: Must be logged in to delete an assessment");
+  }
+
+  await dbConnect();
+
+  try {
+    await Assessment.findOneAndDelete({ _id: assessmentId, userId });
+    console.log(`Assessment ${assessmentId} successfully deleted!`);
+    
+    // Revalidate dashboard path to ensure new data appears
+    revalidatePath("/dashboard");
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete assessment:", error);
+    return { success: false, error: "Failed to delete assessment." };
+  }
+}
