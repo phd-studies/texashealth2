@@ -3,7 +3,7 @@ import path from 'path';
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from 'next/link';
-import { ChevronLeft, AlertTriangle, Activity, Target } from "lucide-react";
+import { ChevronLeft, AlertTriangle, Activity, Target, Stethoscope, ClipboardList, Microscope } from "lucide-react";
 import WoundProgressChart from "@/components/WoundProgressChart";
 
 // Type matching our parsed CSV
@@ -28,14 +28,14 @@ export default async function ReportPage() {
   // Our repo root relative to this file running in Next API is quite a few dirs up...
   // Alternatively, process.cwd() gives the Next.js app root (`app/frontend`). So we go up 2 levels.
   const rootDir = path.resolve(process.cwd(), '../../');
-  const csvPath = path.join(rootDir, 'evaluation_results.csv');
+  const csvPath = path.join(rootDir, 'evaluation_results_2.csv');
 
   let rawData = "";
   try {
     rawData = fs.readFileSync(csvPath, 'utf8');
   } catch (error) {
     console.error("Failed to read CSV:", error);
-    rawData = "image,day,wound_px,area_change,G,S,N\nO,0,0,0,0,0,0"; // Failsafe fallback
+    rawData = "image,trajectory,day,area_px,par,area_change,G,S,N\nO,worsening,0,0,,0,0,0,0"; // Failsafe fallback
   }
 
   // Extremely simple CSV parse
@@ -46,15 +46,15 @@ export default async function ReportPage() {
     // skip header line
     for (let i = 1; i < lines.length; i++) {
         const p = lines[i].split(",");
-        if(p.length >= 7) {
+        if(p.length >= 9) {
             data.push({
                 image: p[0],
-                day: parseInt(p[1], 10),
-                wound_px: parseInt(p[2], 10),
-                area_change: parseFloat(p[3]),
-                granulation: parseFloat(p[4]),
-                slough: parseFloat(p[5]),
-                necrosis: parseFloat(p[6])
+                day: parseInt(p[2], 10),
+                wound_px: parseInt(p[3], 10),
+                area_change: parseFloat(p[5]),
+                granulation: parseFloat(p[6]),
+                slough: parseFloat(p[7]),
+                necrosis: parseFloat(p[8])
             });
         }
     }
@@ -118,7 +118,7 @@ export default async function ReportPage() {
           <div className="bg-white dark:bg-[#1c1c1e] rounded-[2rem] p-6 shadow-apple">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-black dark:text-white tracking-tight">Tissue Progression</h2>
-              <div className="bg-[#007aff]/10 text-[#007aff] dark:bg-[#0a84ff]/20 dark:text-[#0a84ff] text-xs font-bold px-3 py-1 rounded-full px-2">
+              <div className="bg-[#007aff]/10 text-[#007aff] dark:bg-[#0a84ff]/20 dark:text-[#0a84ff] text-xs font-bold py-1 rounded-full px-3">
                 AI Assessed
               </div>
             </div>
@@ -140,17 +140,49 @@ export default async function ReportPage() {
             </div>
           </div>
 
-          {/* Size Metrics */}
           <div className="grid grid-cols-2 gap-4">
-             <div className="bg-white dark:bg-[#1c1c1e] rounded-[2rem] p-5 shadow-apple flex flex-col justify-center gap-1">
-                <Activity className="w-5 h-5 text-orange-500 mb-1" />
-                <p className="text-3xl font-bold text-black dark:text-white tracking-tight">{Math.round(day28?.area_change || 0)}%</p>
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Area Increase</p>
+             {/* Clinical Analysis Metrics */}
+             <div className="col-span-2 bg-white dark:bg-[#1c1c1e] rounded-[2rem] p-6 shadow-apple">
+               <h3 className="text-lg font-bold text-black dark:text-white tracking-tight flex items-center mb-4">
+                 <Microscope className="w-5 h-5 mr-2 text-purple-500" />
+                 Pathology Overview
+               </h3>
+               <div className="space-y-4">
+                 <div className="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-gray-800">
+                   <span className="text-gray-500 dark:text-gray-400 font-medium">Trajectory</span>
+                   <span className="text-red-500 font-bold bg-red-50 dark:bg-red-900/20 px-2.5 py-0.5 rounded-full text-sm">Worsening</span>
+                 </div>
+                 <div className="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-gray-800">
+                   <span className="text-gray-500 dark:text-gray-400 font-medium">Area Growth (28d)</span>
+                   <span className="text-black dark:text-white font-bold">+{Math.round(day28?.area_change || 0)}% Expansion</span>
+                 </div>
+                 <div className="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-gray-800">
+                   <span className="text-gray-500 dark:text-gray-400 font-medium">Slough/Necrosis Level</span>
+                   <span className="text-red-500 font-bold">Critical Threshold</span>
+                 </div>
+               </div>
              </div>
-             <div className="bg-white dark:bg-[#1c1c1e] rounded-[2rem] p-5 shadow-apple flex flex-col justify-center gap-1">
-                <AlertTriangle className="w-5 h-5 text-red-500 mb-1" />
-                <p className="text-3xl font-bold text-black dark:text-white tracking-tight">{Math.round((day28?.slough || 0) * 100) + Math.round((day28?.necrosis || 0) * 100)}%</p>
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Unhealthy</p>
+
+             {/* Action Plan */}
+             <div className="col-span-2 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-[2rem] p-6 shadow-apple">
+               <h3 className="text-lg font-bold text-blue-900 dark:text-blue-300 tracking-tight flex items-center mb-4">
+                 <ClipboardList className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
+                 Recommended Care Plan
+               </h3>
+               <ul className="space-y-3">
+                 <li className="flex items-start">
+                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 mr-3 shrink-0" />
+                   <span className="text-blue-800 dark:text-blue-200 text-sm">Urgent referral to podiatry for advanced debridement of necrotic tissues.</span>
+                 </li>
+                 <li className="flex items-start">
+                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 mr-3 shrink-0" />
+                   <span className="text-blue-800 dark:text-blue-200 text-sm">Initiate broad-spectrum oral antibiotics pending culture results due to systemic risk.</span>
+                 </li>
+                 <li className="flex items-start">
+                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 mr-3 shrink-0" />
+                   <span className="text-blue-800 dark:text-blue-200 text-sm">Strict off-loading of the affected extremity and vascular assessment testing.</span>
+                 </li>
+               </ul>
              </div>
           </div>
 
