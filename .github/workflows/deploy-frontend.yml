@@ -15,7 +15,7 @@ jobs:
           script: |
             set -euo pipefail
 
-            APP_DIR=/home/azureuser/texashealth/app/frontend
+            APP_DIR=/home/azureuser/texashealth2/app/frontend
 
             bash -lc "
               set -e

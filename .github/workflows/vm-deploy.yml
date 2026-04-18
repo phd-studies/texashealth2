@@ -19,7 +19,7 @@ jobs:
           command_timeout: 20m
           script: |
             set -e
-            cd ~/texashealth
+            cd ~/texashealth2
 
             git fetch origin main
             git reset --hard origin/main
@@ -31,7 +31,7 @@ jobs:
             npm run build
 
             sudo env "PATH=$PATH" pm2 delete texashealth-ui || true
-            cd ~/texashealth/app/frontend
+            cd ~/texashealth2/app/frontend
             sudo env "PATH=$PATH" PORT=80 pm2 start npm --name texashealth-ui -- run start
             sudo env "PATH=$PATH" pm2 save
             sudo env "PATH=$PATH" pm2 status
