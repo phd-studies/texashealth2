@@ -42,55 +42,13 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    let warningMsg: string | undefined = undefined;
-    if (process.env.ROBOFLOW_ENABLED === "true") {
-      try {
-        const ROBOFLOW_API_KEY = process.env.ROBOFLOW_API_KEY;
-        const ROBOFLOW_MODEL = process.env.ROBOFLOW_MODEL || "foot_identifier";
-        const ROBOFLOW_VERSION = process.env.ROBOFLOW_VERSION || "1";
-        
-        if (ROBOFLOW_API_KEY) {
-          const modelUrl = `https://detect.roboflow.com/${ROBOFLOW_MODEL}/${ROBOFLOW_VERSION}?api_key=${ROBOFLOW_API_KEY}`;
-          const base64Image = buffer.toString("base64");
-          
-          const detectRes = await fetch(modelUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: base64Image
-          });
-          
-          if (detectRes.ok) {
-            const detectData = await detectRes.json();
-            if (detectData && detectData.predictions) {
-              const feetDetected = detectData.predictions.some((p: any) => {
-                const cls = p.class?.toLowerCase() || "";
-                return (cls.includes("foot") || cls.includes("feet") || cls.includes("ulcer") || cls.includes("wound") || cls.includes("toe")) && p.confidence > 0.40;
-              });
-              
-              if (!feetDetected && detectData.predictions.length === 0) {
-                 warningMsg = "AI Warning: No objects could be identified. Ensure the foot is clearly visible and well-lit.";
-              } else if (!feetDetected) {
-                 warningMsg = "AI Warning: We couldn't confidently identify a foot in this image.";
-              }
-            }
-          } else {
-             const errText = await detectRes.text();
-             console.error("[Roboflow] API Error:", errText);
-             warningMsg = `AI Setup Error (${detectRes.status}): ${errText.substring(0, 80)}...`;
-          }
-        }
-      } catch (aiErr) {
-        console.error("[Roboflow] Integration Error:", aiErr);
-      }
-    }
-
     await blockBlobClient.upload(buffer, buffer.length, {
       blobHTTPHeaders: { blobContentType: file.type },
     });
 
     console.log(`[Upload] userId=${userId} blob=${blobName} url=${blockBlobClient.url}`);
 
-    return NextResponse.json({ url: blockBlobClient.url, warning: warningMsg });
+    return NextResponse.json({ url: blockBlobClient.url });
   } catch (error) {
     console.error("[Upload] Failed:", error);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
