@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { createAssessment } from "@/actions/assessmentActions";
 import { useRouter } from "next/navigation";
 import { Camera, ShieldCheck, Loader2, ImagePlus, X, CheckCircle2 } from "lucide-react";
-import Image from "next/image";
 
 type UploadState = "idle" | "uploading" | "saving" | "done" | "error";
 
@@ -13,14 +12,75 @@ export default function CameraBooth() {
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const [isLiveCamera, setIsLiveCamera] = useState<boolean>(false);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, []);
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    setIsLiveCamera(false);
+  };
+
+  const startCamera = async () => {
+    try {
+      setIsLiveCamera(true);
+      setErrorMsg("");
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (err: any) {
+      setErrorMsg("Failed to access camera: " + err.message);
+      setIsLiveCamera(false);
+    }
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const file = new File([blob], "capture.jpg", { type: "image/jpeg" });
+              setSelectedFile(file);
+              setPreview(URL.createObjectURL(file));
+              setUploadState("idle");
+              stopCamera();
+            }
+          },
+          "image/jpeg",
+          0.9
+        );
+      }
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Client-side validation
     const allowed = ["image/jpeg", "image/jpg", "image/png"];
     if (!allowed.includes(file.type)) {
       setErrorMsg("Only JPEG and PNG files are allowed.");
@@ -52,7 +112,6 @@ export default function CameraBooth() {
     setErrorMsg("");
 
     try {
-      // Step 1: Upload to Azure Blob via our API route
       const formData = new FormData();
       formData.append("file", selectedFile);
 
@@ -68,15 +127,14 @@ export default function CameraBooth() {
 
       const { url } = await res.json();
 
-      // Step 2: Save URL to MongoDB via Server Action
       setUploadState("saving");
       const result = await createAssessment(url);
 
-      if (result.success) {
+      if (result && result.success !== false) {
         setUploadState("done");
         setTimeout(() => router.push("/dashboard"), 1200);
       } else {
-        throw new Error(result.error || "Failed to save assessment");
+        throw new Error(result?.error || "Failed to save assessment");
       }
     } catch (err: any) {
       setErrorMsg(err.message || "Something went wrong. Please try again.");
@@ -87,7 +145,7 @@ export default function CameraBooth() {
   const statusLabel: Record<UploadState, string> = {
     idle: "",
     uploading: "Uploading to Azure...",
-    saving: "Saving to record...",
+    saving: "Saving tracking record...",
     done: "Saved! Redirecting...",
     error: "",
   };
@@ -105,10 +163,9 @@ export default function CameraBooth() {
           </div>
           <h2 className="text-2xl font-bold text-black dark:text-white tracking-tight mb-1">Camera Booth</h2>
           <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-[260px]">
-            Securely upload a wound photo. It will be saved to your Azure storage and logged to your profile.
+            Securely capture or upload a wound photo. It will be saved to your Azure storage and logged to your profile.
           </p>
 
-          {/* Processing State */}
           {isProcessing ? (
             <div className="w-full flex flex-col items-center justify-center p-8 bg-gray-50 dark:bg-[#252528] rounded-2xl border border-gray-100 dark:border-gray-800">
               {uploadState === "done" ? (
@@ -120,53 +177,83 @@ export default function CameraBooth() {
             </div>
           ) : (
             <>
-              {/* Drop / Select Zone */}
-              {!preview ? (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full border-2 border-dashed border-[#007aff]/30 dark:border-[#0a84ff]/30 bg-transparent rounded-2xl p-8 flex flex-col items-center justify-center gap-3 hover:border-[#007aff] hover:bg-blue-50/50 dark:hover:bg-[#0a84ff]/10 transition-all cursor-pointer group"
-                >
-                  <ImagePlus className="w-10 h-10 text-[#007aff]/50 dark:text-[#0a84ff]/50 group-hover:text-[#007aff] dark:group-hover:text-[#0a84ff] transition-colors" />
-                  <span className="text-[#007aff] dark:text-[#0a84ff] font-semibold text-sm group-hover:text-blue-700 transition-colors">
-                    Tap to Select Photo
-                  </span>
-                  <span className="text-gray-400 text-xs">JPEG or PNG, under 4MB</span>
-                </button>
-              ) : (
-                /* Preview */
-                <div className="w-full relative rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800">
-                  <Image
-                    src={preview}
-                    alt="Wound preview"
-                    width={400}
-                    height={300}
-                    className="w-full object-cover rounded-2xl"
-                    style={{ maxHeight: "260px" }}
+              {isLiveCamera && !preview ? (
+                <div className="w-full relative rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 bg-black aspect-[3/4] flex flex-col mb-4">
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    className="w-full h-full object-cover"
                   />
+                  <div className="absolute bottom-4 left-0 w-full flex justify-center gap-6">
+                    <button
+                      onClick={stopCamera}
+                      className="bg-black/60 hover:bg-black/80 text-white rounded-full p-4 backdrop-blur-md transition-colors"
+                    >
+                      <X className="w-6 h-6" />
+                    </button>
+                    <button
+                      onClick={capturePhoto}
+                      className="bg-white text-black rounded-full p-4 hover:scale-105 active:scale-95 transition-all shadow-xl"
+                    >
+                      <Camera className="w-7 h-7" />
+                    </button>
+                  </div>
+                  <canvas ref={canvasRef} className="hidden" />
+                </div>
+              ) : !preview ? (
+                <div className="w-full flex flex-col gap-3">
                   <button
-                    onClick={handleClear}
-                    className="absolute top-3 right-3 bg-black/60 hover:bg-black/80 text-white rounded-full p-1.5 transition-colors"
-                    aria-label="Remove photo"
+                    type="button"
+                    onClick={startCamera}
+                    className="w-full border-2 border-[#007aff]/30 dark:border-[#0a84ff]/30 bg-blue-50/20 dark:bg-blue-900/10 rounded-2xl p-6 flex flex-col items-center justify-center gap-2 hover:border-[#007aff] dark:hover:border-[#0a84ff] transition-all cursor-pointer group"
                   >
-                    <X className="w-4 h-4" />
+                    <Camera className="w-8 h-8 text-[#007aff]/70 dark:text-[#0a84ff]/70 group-hover:text-[#007aff] dark:group-hover:text-[#0a84ff] transition-colors" />
+                    <span className="text-[#007aff] dark:text-[#0a84ff] font-semibold text-sm group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                      Take Live Photo
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full border-2 border-dashed border-gray-300 dark:border-gray-700 bg-transparent rounded-2xl p-6 flex flex-col items-center justify-center gap-2 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all cursor-pointer group"
+                  >
+                    <ImagePlus className="w-8 h-8 text-gray-400 group-hover:text-gray-500 transition-colors" />
+                    <span className="text-gray-500 font-semibold text-sm transition-colors">
+                      Upload from Device
+                    </span>
+                    <span className="text-gray-400 text-xs">JPEG or PNG, under 4MB</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="w-full flex flex-col gap-3">
+                  <div className="w-full relative rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800">
+                    <img
+                      src={preview}
+                      alt="Wound preview"
+                      className="w-full object-cover rounded-2xl"
+                      style={{ maxHeight: "300px" }}
+                    />
+                    <button
+                      onClick={handleClear}
+                      className="absolute top-3 right-3 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition-colors"
+                      aria-label="Remove photo"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
+                  <button
+                    onClick={handleUpload}
+                    className="w-full bg-[#007aff] dark:bg-[#0a84ff] hover:opacity-90 active:scale-[0.98] transition-all text-white font-semibold rounded-2xl py-4 shadow-apple shadow-blue-500/20 text-[15px] tracking-wide"
+                  >
+                    Upload & Save Assessment
                   </button>
                 </div>
               )}
-
-              {/* Error */}
+              
               {errorMsg && (
-                <p className="text-red-500 text-xs mt-3 font-medium">{errorMsg}</p>
-              )}
-
-              {/* Upload Button */}
-              {selectedFile && (
-                <button
-                  onClick={handleUpload}
-                  className="mt-4 w-full bg-[#007aff] dark:bg-[#0a84ff] hover:opacity-90 active:scale-[0.98] transition-all text-white font-semibold rounded-2xl py-4 shadow-apple shadow-blue-500/20 text-[15px] tracking-wide"
-                >
-                  Upload & Save Assessment
-                </button>
+                <p className="text-red-500 text-xs mt-3 font-medium px-2">{errorMsg}</p>
               )}
             </>
           )}
@@ -175,13 +262,14 @@ export default function CameraBooth() {
             ref={fileInputRef}
             type="file"
             accept="image/jpeg,image/jpg,image/png"
+            capture="environment"
             onChange={handleFileChange}
             className="hidden"
           />
 
           <div className="mt-5 flex items-center justify-center text-xs text-gray-400 dark:text-gray-500 font-medium">
             <ShieldCheck className="w-4 h-4 mr-1 text-green-500 opacity-80" />
-            Files stored in Azure South Central US
+            Files stored securely in Azure
           </div>
         </div>
       </div>
