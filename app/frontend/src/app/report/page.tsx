@@ -1,5 +1,4 @@
-import fs from 'fs';
-import path from 'path';
+
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from 'next/link';
@@ -25,40 +24,37 @@ export default async function ReportPage() {
   }
 
   // Read the CSV file directly from the repo root
-  // Our repo root relative to this file running in Next API is quite a few dirs up...
-  // Alternatively, process.cwd() gives the Next.js app root (`app/frontend`). So we go up 2 levels.
-  const rootDir = path.resolve(process.cwd(), '../../');
-  const csvPath = path.join(rootDir, 'evaluation_results_2.csv');
-
-  let rawData = "";
-  try {
-    rawData = fs.readFileSync(csvPath, 'utf8');
-  } catch (error) {
-    console.error("Failed to read CSV:", error);
-    rawData = "image,trajectory,day,area_px,par,area_change,G,S,N\nO,worsening,0,0,,0,0,0,0"; // Failsafe fallback
-  }
-
-  // Extremely simple CSV parse
-  const lines = rawData.trim().split('\n');
-  const data: OutData[] = [];
-  
-  if (lines.length > 1) {
-    // skip header line
-    for (let i = 1; i < lines.length; i++) {
-        const p = lines[i].split(",");
-        if(p.length >= 9) {
-            data.push({
-                image: p[0],
-                day: parseInt(p[2], 10),
-                wound_px: parseInt(p[3], 10),
-                area_change: parseFloat(p[5]),
-                granulation: parseFloat(p[6]),
-                slough: parseFloat(p[7]),
-                necrosis: parseFloat(p[8])
-            });
-        }
-    }
-  }
+  const data: OutData[] = [
+    { day: 0, area_change: 0.0, granulation: 0.928, slough: 0.0302, necrosis: 0.0418, wound_px: 5643, image: "1363" },
+    { day: 1, area_change: 0.0, granulation: 0.9289, slough: 0.0295, necrosis: 0.0416, wound_px: 5643, image: "1363" },
+    { day: 2, area_change: 0.0, granulation: 0.927, slough: 0.0315, necrosis: 0.0415, wound_px: 5643, image: "1363" },
+    { day: 3, area_change: 0.0, granulation: 0.9279, slough: 0.0308, necrosis: 0.0413, wound_px: 5643, image: "1363" },
+    { day: 4, area_change: 0.0, granulation: 0.9297, slough: 0.0297, necrosis: 0.0406, wound_px: 5643, image: "1363" },
+    { day: 5, area_change: 6.17, granulation: 0.9374, slough: 0.0249, necrosis: 0.0377, wound_px: 5991, image: "1363" },
+    { day: 6, area_change: 6.17, granulation: 0.9366, slough: 0.0246, necrosis: 0.0388, wound_px: 5991, image: "1363" },
+    { day: 7, area_change: 6.17, granulation: 0.9354, slough: 0.0246, necrosis: 0.04, wound_px: 5991, image: "1363" },
+    { day: 8, area_change: 6.17, granulation: 0.9341, slough: 0.0248, necrosis: 0.0411, wound_px: 5991, image: "1363" },
+    { day: 9, area_change: 6.17, granulation: 0.9324, slough: 0.025, necrosis: 0.0426, wound_px: 5991, image: "1363" },
+    { day: 10, area_change: 12.46, granulation: 0.9316, slough: 0.0241, necrosis: 0.0442, wound_px: 6346, image: "1363" },
+    { day: 11, area_change: 12.46, granulation: 0.9299, slough: 0.024, necrosis: 0.046, wound_px: 6346, image: "1363" },
+    { day: 12, area_change: 12.46, granulation: 0.9274, slough: 0.024, necrosis: 0.0486, wound_px: 6346, image: "1363" },
+    { day: 13, area_change: 12.46, granulation: 0.9241, slough: 0.024, necrosis: 0.0519, wound_px: 6346, image: "1363" },
+    { day: 14, area_change: 18.89, granulation: 0.9213, slough: 0.0236, necrosis: 0.0551, wound_px: 6709, image: "1363" },
+    { day: 15, area_change: 18.89, granulation: 0.9162, slough: 0.0238, necrosis: 0.06, wound_px: 6709, image: "1363" },
+    { day: 16, area_change: 18.89, granulation: 0.9104, slough: 0.0245, necrosis: 0.0651, wound_px: 6709, image: "1363" },
+    { day: 17, area_change: 18.89, granulation: 0.9046, slough: 0.0255, necrosis: 0.0699, wound_px: 6709, image: "1363" },
+    { day: 18, area_change: 18.89, granulation: 0.8989, slough: 0.0267, necrosis: 0.0745, wound_px: 6709, image: "1363" },
+    { day: 19, area_change: 25.47, granulation: 0.8948, slough: 0.0269, necrosis: 0.0783, wound_px: 7080, image: "1363" },
+    { day: 20, area_change: 25.47, granulation: 0.8896, slough: 0.028, necrosis: 0.0824, wound_px: 7080, image: "1363" },
+    { day: 21, area_change: 25.47, granulation: 0.8841, slough: 0.0296, necrosis: 0.0863, wound_px: 7080, image: "1363" },
+    { day: 22, area_change: 25.47, granulation: 0.8772, slough: 0.0323, necrosis: 0.0905, wound_px: 7080, image: "1363" },
+    { day: 23, area_change: 32.15, granulation: 0.8727, slough: 0.0372, necrosis: 0.0901, wound_px: 7457, image: "1363" },
+    { day: 24, area_change: 32.15, granulation: 0.833, slough: 0.0504, necrosis: 0.1166, wound_px: 7457, image: "1363" },
+    { day: 25, area_change: 32.15, granulation: 0.7584, slough: 0.0686, necrosis: 0.1731, wound_px: 7457, image: "1363" },
+    { day: 26, area_change: 32.15, granulation: 0.6586, slough: 0.0857, necrosis: 0.2557, wound_px: 7457, image: "1363" },
+    { day: 27, area_change: 32.15, granulation: 0.5351, slough: 0.0975, necrosis: 0.3674, wound_px: 7457, image: "1363" },
+    { day: 28, area_change: 38.97, granulation: 0.4975, slough: 0.0972, necrosis: 0.4053, wound_px: 7842, image: "1363" },
+  ];
 
   // Get start and end comparisons
   const day0 = data.find(d => d.day === 0);
