@@ -74,7 +74,9 @@ export async function POST(request: Request) {
               }
             }
           } else {
-             console.error("[Roboflow] API Error:", await detectRes.text());
+             const errText = await detectRes.text();
+             console.error("[Roboflow] API Error:", errText);
+             warningMsg = `AI Setup Error (${detectRes.status}): ${errText.substring(0, 80)}...`;
           }
         }
       } catch (aiErr) {
