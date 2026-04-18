@@ -262,7 +262,6 @@ export default function CameraBooth() {
             ref={fileInputRef}
             type="file"
             accept="image/jpeg,image/jpg,image/png"
-            capture="environment"
             onChange={handleFileChange}
             className="hidden"
           />
