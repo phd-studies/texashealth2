@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import dbConnect from "@/lib/mongodb";
 import Assessment from "@/models/Assessment";
 import PatientProfile from "@/models/PatientProfile";
-import { FileStack, Camera, User, ChevronRight, Trash } from "lucide-react";
+import { FileStack, Camera, User, ChevronRight, Trash, Activity } from "lucide-react";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { deleteAssessment } from "@/actions/assessmentActions";
@@ -61,6 +61,19 @@ export default async function DashboardPage() {
                 </div>
               </div>
               <ChevronRight className="w-5 h-5 text-gray-300 dark:text-gray-600 mr-2 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            
+            <Link href="/report" className="col-span-2 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/10 dark:to-pink-900/10 border-2 border-red-500/20 dark:border-red-500/30 rounded-[2rem] p-5 shadow-apple flex items-center justify-between hover:border-red-500/40 transition-colors group">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
+                  <Activity className="text-red-500 dark:text-red-400 w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-red-700 dark:text-red-400 text-lg">Ulcer Analytics</h3>
+                  <p className="text-xs text-red-600/80 dark:text-red-400/80 font-medium mt-0.5">View diagnosis report</p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-red-300 dark:text-red-600 mr-2 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
