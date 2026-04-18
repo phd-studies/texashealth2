@@ -124,19 +124,25 @@ export default function CameraBooth() {
         body: formData,
       });
 
+      const payload = await res.json();
+
       if (!res.ok) {
-        const { error } = await res.json();
-        throw new Error(error || "Upload failed");
+        throw new Error(payload.error || "Upload failed");
       }
 
-      const { url } = await res.json();
+      const { url, warning } = payload;
 
       setUploadState("saving");
       const result = await createAssessment(url);
 
       if (result && result.success !== false) {
         setUploadState("done");
-        setTimeout(() => router.push("/dashboard"), 1200);
+        if (warning) {
+          setErrorMsg(warning);
+          setTimeout(() => router.push("/dashboard"), 4500);
+        } else {
+          setTimeout(() => router.push("/dashboard"), 1200);
+        }
       } else {
         throw new Error(result?.error || "Failed to save assessment");
       }
@@ -178,6 +184,15 @@ export default function CameraBooth() {
                 <Loader2 className="w-10 h-10 animate-spin text-[#007aff] dark:text-[#0a84ff] mb-3" />
               )}
               <p className="text-sm font-semibold text-black dark:text-white">{statusLabel[uploadState]}</p>
+              
+              {/* AI Warning Display */}
+              {errorMsg && uploadState === "done" && (
+                <div className="mt-5 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl max-w-xs animate-in fade-in slide-in-from-bottom-2 duration-500">
+                  <p className="text-orange-600 dark:text-orange-500 text-xs font-semibold leading-relaxed tracking-wide">
+                    {errorMsg}
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             <>
