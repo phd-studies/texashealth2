@@ -136,6 +136,14 @@ export default async function ReportPage() {
             </div>
           </div>
 
+          {/* Educational Call to Action */}
+          <Link href="/how-it-works" className="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors rounded-[1.5rem] p-4 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-700 active:scale-[0.98] mt-2 mb-2 group">
+            <div className="flex items-center text-[#007aff] dark:text-[#0a84ff] font-bold tracking-tight">
+              Interactive Image Timeline
+            </div>
+            <p className="text-xs text-gray-500 mt-1">See the AI parse test photos day-by-day</p>
+          </Link>
+
           <div className="grid grid-cols-2 gap-4">
              {/* Clinical Analysis Metrics */}
              <div className="col-span-2 bg-white dark:bg-[#1c1c1e] rounded-[2rem] p-6 shadow-apple">
