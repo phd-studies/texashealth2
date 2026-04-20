@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import WoundProgressChart from "@/components/WoundProgressChart";
 
 // The timeline for 11 tracked test_photos (Day 0 to Day 10)
 const data = [
@@ -38,6 +39,9 @@ export default function HowItWorksPage() {
   const gPercent = Math.round(currentData.granulation * 100);
   const sPercent = Math.round(currentData.slough * 100);
   const nPercent = Math.round(currentData.necrosis * 100);
+
+  // Sliced data to show the progressive line chart
+  const slicedData = data.slice(0, activeDay + 1);
 
   return (
     <div className="min-h-screen flex justify-center bg-[#f2f2f7] dark:bg-black">
@@ -96,6 +100,12 @@ export default function HowItWorksPage() {
 
             {/* Dynamic Data Plotting */}
             <div className="w-full space-y-4">
+               {/* Time Series Real Time Plot */}
+               <div className="mb-6 -mx-2 bg-gray-50 dark:bg-black/50 border border-gray-100 dark:border-gray-800 rounded-2xl pt-2">
+                 <h3 className="text-center text-xs font-bold text-gray-500 mt-2">TIME SERIES PROGRESSION</h3>
+                 <WoundProgressChart data={slicedData} />
+               </div>
+
                <div>
                   <div className="flex justify-between text-sm font-semibold mb-1">
                     <span className="text-[#ff2d55]">Granulation</span>
