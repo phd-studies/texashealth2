@@ -62,7 +62,7 @@ export default function WoundProgressChart({ data }: Props) {
             formatter={(value: any) => [`${value}%`]}
             labelStyle={{ color: '#a1a1aa', marginBottom: '4px' }}
           />
-          <Line type="linear" dataKey="Necrosis" stroke="#000000" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+          <Line type="linear" dataKey="Necrosis" stroke="#a855f7" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
           <Line type="linear" dataKey="Slough" stroke="#ffcc00" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
           <Line type="linear" dataKey="Granulation" stroke="#ff2d55" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
         </LineChart>

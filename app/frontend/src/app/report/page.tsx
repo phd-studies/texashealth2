@@ -131,7 +131,7 @@ export default async function ReportPage() {
                 <div className="w-3 h-3 rounded-full bg-[#ffcc00] mr-1.5 opacity-80" /> Slough
               </div>
               <div className="flex items-center text-xs font-medium text-gray-500 dark:text-gray-400">
-                <div className="w-3 h-3 rounded-full bg-[#000000] dark:bg-gray-400 mr-1.5 opacity-80" /> Necrosis
+                <div className="w-3 h-3 rounded-full bg-[#a855f7] mr-1.5 opacity-80" /> Necrosis
               </div>
             </div>
           </div>
